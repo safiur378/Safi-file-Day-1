@@ -1,0 +1,105 @@
++ # Day 10 - Condition, Route Table, Secret, Loops
++
++ ##   Ansible- When condition 
++
++ ---
++ - name: Install tool based on OS
++   hosts: all
++   become: yes
++ 
++   tasks:
++      - name: Install htop
++        yum:
++          name: htop
++          state: present
++        when: ansible_facts{'os_family'} =="RedHat"
++
++
++ ##    Terraform - Route table + Association
++
++  resource "aws_route_table" pathnexRT" {
++    vpc_id = aws_vpc.PathnexPC.id
++
++    route {
++      cidr_block = "0.0.0.0/0"
++      gateway_id = aws_internet_gateway.PathnexIGW.id
++     }
++
++     tags = {
++       Name = "Pathnex-Routetable"
++      }
++    }
++
++ resource "aws_route_table_association" "PathnexRTA" {
++   subnet_id     = aws_subnet.pathnexSubnet.id
++   route_table_id = aws_route_table.pathnexRT.id
++    }
++
++
++ ##    Kubernetes = Secret
++
++ apiversion: vi
++ kind: secret
++ metadata:
++   name: pathne-secret
++ type: Opaque
++ data:
++   password: cGF0aG51eDEyMe==    # "pathnex123" base64
++
++
++ ##    shell script - for loop 1-10
++
++ #!/bin/bash
++
++ for i in {1..10}; do
++   echo "Number: &i"
++ done
++
++
++ # Caching Dependencies
++
++ ##   jenkin pipline - cache Maven Dependencies
++ you will learn how to  **reuse dependencies tp speed up build**
++
++ pipeline {
++     agent any 
++     environment {
++        INSTITUTE_NAME = "Pathnex"
++      }
++      stages {
++          stage('checkout') {
++             steps {
++                git url:  'https://github.com/pathnex/sample-java-app.git'
++             }
++         }
++         stage('Build') {
++            steps {
++               sh '''
++               if [ -d ".m2" ]; then
++                   echo "Using cached dependencies"
++               else
++                  mvn clean compile
++                fi
++                '''
++              }
++          }
++       }
++   }
++
++ ##     Gitlab CI - cache Dependencies
++ you will learn how to **Cache dependencies in Gitlab CI**
++
++ stages:
++   - build
++
++ build:
++    stage: build
++    image: maven-cache
++    cache:
++      key: maven-cache
++      path:
++        - .m2/repository
++    script:
++      - git clone https://gitjub.com/Pathnex/sample-java-app.git
++      - cd sample-java-app
++      - mvn clean compile
