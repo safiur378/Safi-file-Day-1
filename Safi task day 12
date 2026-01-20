@@ -1,0 +1,110 @@
++ Day 12  - Scaling Applications and Autmation
++     Ansible - Setup Auto-Scaling Group (ASG)
++ - name: setup Auto Scaling Group
++   hosts: all
++   become: yes
++   tasks:
++     - name: Create Launch Configuration
++       ec2_asg:
++         name: pathnex-asg
++         region: us-east-1
++         launch_config_name: pathnex-launch-config
++         min_size: 1
++         max_size: 3
++         desired_capacity: 2
++         vpc_zone_identifier: subnet-12345678
++ *    Terraform-Create a load Balancer with EC2 instances
++ resources "aws_ib" "pathnex_1b"
++   name                = "pathnex-1b"
++   internal            = false
++   load_balancer_type  = "aplication"
++   security_groups     = [aws_security_group.allow_ssh_http.id}
++   subnets             = [aws_subnet.piblic.id]
++     }
++
++ resource "aws_instance" "pathnex_ec2" {
++   ami           = "ami-0abcd1234abcd1234"
++   instance_type = "t2.micro"
++   security_groups = [aws_security_group.allow_ssh_http.name]
++   tags= {
++     Name = "pathnex-EC2"
++    }
++  }
++    Kubernetes-Horizontal pod Autoscaler (HPA) with Load Balancer
++ apiVersion: app/v1
++ kind: Deployment
++ metadata:
++   name: pathnex-web-app
++ spec:
++   replicas: 2
++   selector:
++     matchLables:
++       app: pathnex-web-app
++   template:
++     metadata:
++       labels:
++         app: pathnex-web-app
++     spec:
++       containers:
++         - name: web
++           image: nginx
++           ports:
++             - containerport: 80
++ ---
++ apiversion: autosocaaling/v2
++ kind: HorizontalPodAutoscaler
++ metadata:
++   name: pathnex-web-app-hpa
++ spec:
++   scaleTargetRef:
++     apiVersion: app/v1
++     kind:  Deployment
++     name:  pathnex-web-app
++   minReplicas: 1
++   maxReplicas:5
++   targetCPUUtillzaationPercentage: 80
++     jenkinfile - Implement Parallel Stages
++ pipeline {
++     agent any
++     stages {
++         stage('Build & Test') {
++            parallel {
++                stage('Build') {
++                   steps [
++                       echo 'Building project...
++                  }
++             }
++             stage('Text') {
++                 steps  {
++                     echo 'Runing tets...
++                  }
++             }
++      ]
++    }
++    stage('Deploy') {
++        steps {
++            echo 'Deploying project...
++          }
++       }
++  }
++ }
++ * Gitlab CI/CD -Parallel Jobs for Build & Test
++ Stages:
++   - build
++   - test
++   - deploy
++
++ build:
++   stage: build
++   script:
++     - docker build -t pathnex-web-app
++
++ test:
++   stage: test
++   script:
++     - docker run pathnex-web-app npm test
++
++ deploy:
++    stage: deploy
++    script:
++       - kubectl apply -f kubernetes/deployment.yaml
