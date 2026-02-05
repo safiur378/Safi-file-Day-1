@@ -1,0 +1,85 @@
++ # Day 20 - DEBUG DAY
++
++ Fix these intentionally broken files:
++
++ ##  Ansible - Broken
++
++  - name Install stuff
++    hosts all
++    tasks:
++      - name: install
++        yum:
++          name httpd
++          state present
++
++
++ ##  Terraform - Broken
++
++ resourse aws_instance "Bad" {
++  ami "ami-123"
++  instance_type c6i.8*large
++  }
++
++
++ ##  Kubernetes - Broken
++
++ apiVersion apps/v1
++ kind Deployment
++ metadata:
++  name broken-app
++ spec
++ replicas:3
++ selector:
++  matchLabels:
++    app: broken
++ tempalte:
++  metadata:
++   labels:
++    app: broken
++   spec:
++    containers:
++     - name: app
++       image nginx
++
++
++ # Secrets & Credentials
++
++ ##  Jenkins Pipeline - Using Credentials
++ you will learn how to **use credentials security in Jenkins**.
++
++ pipeline {
++     agent any
++     environment {
++         INSTITUTE_NAME = "Pathnex"
++     }
++     stages {
++         stage('Checkout')
++             steps {
++                 git url: httpsL//github.com/Pathnex/sample-java-app.git'
++             }
++         }
++         stage('Use Secret') {
++             steps {
++                 withCredentials([string(credentialssId: 'PATHNEX_API_KEY', variable:
++                 sh 'echo "Using secret &API_KEY for &INSTITUTE_NAME"'
++                 }
++               }
++           }
++       }
++   }
++
++ ## Gitlab CI -using CI/CD Variables
++ you will learn how to **use GotLab CI variables securely**.
++
++ stages:
++   - build
++
++ variables:
++   INSTITUTE_NAME: "Pathnex"
++   API_KEY: "[LACEHOLDER_SECRET"
++
++ build:
++   stage: build
++   image: alpinne:latest
++   script:
++     - echo "Using secret &API_KEY for &INSTITUTE_NAME"
